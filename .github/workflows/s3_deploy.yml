@@ -28,4 +28,4 @@ jobs:
       - name: Sync /files to S3
         run: |
           echo "Uploading /files to bucket: ${{ secrets.BUCKET_NAME }}"
-          aws s3 sync ./files/ s3://${{ secrets.BUCKET_NAME }} --delete
+          aws s3 sync ./files/ s3://${{ secrets.BUCKET_NAME }}
