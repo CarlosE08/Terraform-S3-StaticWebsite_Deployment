@@ -43,7 +43,9 @@ resource "aws_s3_bucket_website_configuration" "website" {
     suffix = "index.html"
   }
 
-  depends_on = var.use_existing_bucket ? [] : [aws_s3_bucket.website]
+  depends_on = [
+  aws_s3_bucket.website
+  ]
 }
 
 data "aws_iam_policy_document" "website_policy" {
@@ -63,6 +65,6 @@ resource "aws_s3_bucket_policy" "website_policy" {
   policy = data.aws_iam_policy_document.website_policy.json
 
   depends_on = [
-    aws_s3_bucket_public_access_block.public_access
+  aws_s3_bucket.website
   ]
 }
