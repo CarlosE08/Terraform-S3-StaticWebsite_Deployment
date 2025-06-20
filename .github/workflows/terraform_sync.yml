@@ -17,14 +17,13 @@ jobs:
     defaults:
       run:
         shell: bash
-        #working-directory: ./main
 
     steps:
-    # Clona el repositorio
+    # 1. Clona el repositorio
     - name: Checkout
       uses: actions/checkout@v2
 
-    # ✅ Verifica si el bucket ya existe
+    # 2. Verifica si el bucket ya existe
     - name: Check if S3 bucket exists
       id: check_bucket
       env:
@@ -41,7 +40,7 @@ jobs:
           echo "USE_EXISTING_BUCKET=false" >> $GITHUB_ENV
         fi
 
-    # 📝 Crea terraform.tfvars con valores desde los secrets y validación previa
+    # 3. Genera archivo terraform.tfvars con los secrets y bandera de bucket existente
     - name: Generate terraform.tfvars from secrets
       run: |
         cat > terraform.tfvars <<EOF
@@ -50,41 +49,40 @@ jobs:
         region         = "${{ secrets.AWS_REGION }}"
         bucket_name    = "${{ secrets.BUCKET_NAME }}"
         EOF
-      #working-directory: ./main
 
-    # Instala Terraform
+    # 4. Instala Terraform
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.6.6
 
-    # Inicializa Terraform
+    # 5. Terraform init
     - name: Terraform Init
       id: init
       run: terraform init
 
-    # Verifica formato del código
+    # 6. Verifica formato (no bloqueante)
     - name: Terraform Format (non-blocking)
       run: terraform fmt -check -recursive || true
 
-    # Valida sintaxis y dependencias
+    # 7. Validación (siempre)
     - name: Terraform Validate
       id: validate
       run: terraform validate
 
-    # Ejecuta `terraform plan` si es un Pull Request
+    # 8. Plan solo si es PR y el bucket no existe
     - name: Terraform Plan
       id: plan
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && env.USE_EXISTING_BUCKET == 'false'
       run: |
         terraform plan -var-file="terraform.tfvars" -no-color > plan.txt
         echo "PLAN_OUTPUT<<EOF" >> $GITHUB_ENV
         cat plan.txt >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
 
-    # Publica el plan como comentario en el PR
+    # 9. Comenta plan en el PR
     - name: Add Plan Comment
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && env.USE_EXISTING_BUCKET == 'false'
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -97,7 +95,7 @@ jobs:
             body: `### 📖 Terraform Plan\n\n\`\`\`hcl\n${output}\n\`\`\``
           });
 
-    # Ejecuta `terraform apply` en push a main
+    # 10. Apply solo si es push a main y el bucket no existe
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push' && env.USE_EXISTING_BUCKET == 'false'
       run: terraform apply -var-file="terraform.tfvars" -auto-approve
