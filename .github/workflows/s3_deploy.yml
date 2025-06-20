@@ -2,7 +2,7 @@ name: Deploy to S3
 
 on:
   workflow_run:
-    workflows: ["Terraform AWS Modular"] # Este debe coincidir con el nombre del workflow de Terraform
+    workflows: ["Terraform AWS Modular"] # Este debe coincidir con `name:` en terraform_sync.yml
     types:
       - completed
 
