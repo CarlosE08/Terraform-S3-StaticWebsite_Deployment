@@ -2,10 +2,11 @@
 # 1. Locales para acceso condicional                                          #
 ###############################################################################
 locals {
-  bucket_id   = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].id : aws_s3_bucket.website.id
-  bucket_arn  = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].arn : aws_s3_bucket.website.arn
+  bucket_id   = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].id : aws_s3_bucket.website[0].id
+  bucket_arn  = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].arn : aws_s3_bucket.website[0].arn
   bucket_name = var.bucket_name
 }
+
 
 variable "apply_bucket_policy" {
   type    = bool
@@ -68,7 +69,8 @@ resource "aws_s3_bucket_website_configuration" "website" {
 ###############################################################################
 
 resource "aws_s3_bucket_policy" "public_read_policy" {
-  bucket = aws_s3_bucket.website.bucket
+  count  = var.apply_bucket_policy ? 1 : 0
+  bucket = local.bucket_id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -78,8 +80,9 @@ resource "aws_s3_bucket_policy" "public_read_policy" {
         Effect    = "Allow",
         Principal = "*",
         Action    = "s3:GetObject",
-        Resource  = "arn:aws:s3:::${aws_s3_bucket.website}/*"
+        Resource  = "arn:aws:s3:::${local.bucket_name}/*"
       }
     ]
   })
 }
+
