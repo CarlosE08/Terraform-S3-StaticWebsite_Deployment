@@ -31,4 +31,5 @@ module "aws_s3" {
   common_tags   = var.common_tags
   generate_name = local.generate_name
   bucket_name   = var.bucket_name
+  region       = var.region
 }
