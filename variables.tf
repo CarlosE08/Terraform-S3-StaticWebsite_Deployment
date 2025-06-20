@@ -3,6 +3,7 @@ variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "region" {}
 
+# Nombre del bucket S3
 variable "bucket_name" {}
 
 variable "common_tags" {
