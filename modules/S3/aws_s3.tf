@@ -2,8 +2,8 @@
 # 1. Locales para acceso condicional                                          #
 ###############################################################################
 locals {
-  bucket_id   = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].id : aws_s3_bucket.website[0].id
-  bucket_arn  = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].arn : aws_s3_bucket.website[0].arn
+  bucket_id   = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].id : aws_s3_bucket.website.id
+  bucket_arn  = var.use_existing_bucket ? data.aws_s3_bucket.existing[0].arn : aws_s3_bucket.website.arn
   bucket_name = var.bucket_name
 }
 
@@ -68,7 +68,7 @@ resource "aws_s3_bucket_website_configuration" "website" {
 ###############################################################################
 
 resource "aws_s3_bucket_policy" "public_read_policy" {
-  bucket = aws_s3_bucket.website.id
+  bucket = aws_s3_bucket.website.bucket
 
   policy = jsonencode({
     Version = "2012-10-17",
