@@ -68,7 +68,7 @@ resource "aws_s3_bucket_website_configuration" "website" {
 ###############################################################################
 
 resource "aws_s3_bucket_policy" "public_read_policy" {
-  bucket = aws_s3_bucket.static_site.id
+  bucket = aws_s3_bucket.website.id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -78,7 +78,7 @@ resource "aws_s3_bucket_policy" "public_read_policy" {
         Effect    = "Allow",
         Principal = "*",
         Action    = "s3:GetObject",
-        Resource  = "${bucket_arn}/*"
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.website}/*"
       }
     ]
   })
