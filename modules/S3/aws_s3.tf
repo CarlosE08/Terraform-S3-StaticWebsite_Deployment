@@ -7,6 +7,7 @@ locals {
   bucket_name = var.bucket_name
 }
 
+
 variable "apply_bucket_policy" {
   type    = bool
   default = false
@@ -67,24 +68,21 @@ resource "aws_s3_bucket_website_configuration" "website" {
 # 5. Política pública de lectura                                              #
 ###############################################################################
 
-data "aws_iam_policy_document" "website_policy" {
-  statement {
-    sid       = "AllowPublicRead"
-    actions   = ["s3:GetObject"]
-    resources = ["${local.bucket_arn}/*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "website_policy" {
+resource "aws_s3_bucket_policy" "public_read_policy" {
   count  = var.apply_bucket_policy ? 1 : 0
   bucket = local.bucket_id
-  policy = data.aws_iam_policy_document.website_policy.json
-  
-  depends_on = [
-    aws_s3_bucket.website
-  ]
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject",
+        Effect    = "Allow",
+        Principal = "*",
+        Action    = "s3:GetObject",
+        Resource  = "arn:aws:s3:::${local.bucket_name}/*"
+      }
+    ]
+  })
 }
+
