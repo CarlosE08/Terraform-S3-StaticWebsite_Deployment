@@ -7,6 +7,11 @@ locals {
   bucket_name = var.bucket_name
 }
 
+variable "apply_bucket_policy" {
+  type    = bool
+  default = false
+}
+
 ###############################################################################
 # 2. Bucket S3 para hosting estático                                          #
 ###############################################################################
@@ -24,7 +29,7 @@ resource "aws_s3_bucket" "website" {
   force_destroy = true
 
   tags = merge(var.common_tags, {
-    environment = terraform.workspace
+    environment = "${terraform.workspace}"
   })
 }
 
@@ -75,9 +80,10 @@ data "aws_iam_policy_document" "website_policy" {
 }
 
 resource "aws_s3_bucket_policy" "website_policy" {
+  count  = var.apply_bucket_policy ? 1 : 0
   bucket = local.bucket_id
   policy = data.aws_iam_policy_document.website_policy.json
-
+  
   depends_on = [
     aws_s3_bucket.website
   ]
