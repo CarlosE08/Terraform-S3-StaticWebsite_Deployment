@@ -7,10 +7,13 @@ locals {
   bucket_name = var.bucket_name
 }
 
-
+################################################################################
+# Variables de entrada para el módulo S3
+################################################################################
 variable "apply_bucket_policy" {
   type    = bool
-  default = false
+  default = true
+  description = "Si es true, aplica una política pública de lectura al bucket S3"
 }
 
 ###############################################################################
