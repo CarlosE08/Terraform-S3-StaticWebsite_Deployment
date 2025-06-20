@@ -8,14 +8,14 @@ resource "aws_s3_bucket_policy" "website_policy" {
 data "aws_iam_policy_document" "website_policy" {
   statement {
     sid = "AllowPublicRead"
- 
+
     principals {
       type        = "AWS"
       identifiers = ["*"]
     }
- 
+
     actions = ["s3:GetObject"]
- 
+
     resources = [
       "${var.bucket_arn}/*"
     ]

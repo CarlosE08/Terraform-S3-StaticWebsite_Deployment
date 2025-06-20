@@ -1,4 +1,4 @@
-variable common_tags { }
-variable generate_name { }
+variable "common_tags" {}
+variable "generate_name" {}
 #variable region { }
-variable bucket_name { }
+variable "bucket_name" {}
