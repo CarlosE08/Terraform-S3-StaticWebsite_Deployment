@@ -24,7 +24,24 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    # Crea terraform.tfvars con valores desde los secrets
+    # ✅ Verifica si el bucket ya existe
+    - name: Check if S3 bucket exists
+      id: check_bucket
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        echo "Checking existence of bucket: ${{ secrets.BUCKET_NAME }}"
+        if aws s3api head-bucket --bucket "${{ secrets.BUCKET_NAME }}" 2>/dev/null; then
+          echo "Bucket exists. Reusing it."
+          echo "USE_EXISTING_BUCKET=true" >> $GITHUB_ENV
+        else
+          echo "Bucket does not exist. Terraform will create it."
+          echo "USE_EXISTING_BUCKET=false" >> $GITHUB_ENV
+        fi
+
+    # 📝 Crea terraform.tfvars con valores desde los secrets y validación previa
     - name: Generate terraform.tfvars from secrets
       run: |
         cat > terraform.tfvars <<EOF
