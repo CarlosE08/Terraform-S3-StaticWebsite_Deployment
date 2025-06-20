@@ -17,7 +17,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./main
+        #working-directory: ./main
 
     steps:
     # Clona el repositorio
@@ -33,7 +33,7 @@ jobs:
             region         = "${{ secrets.AWS_REGION }}"
             bucket_name    = "${{ secrets.BUCKET_NAME }}"
             EOF
-      working-directory: ./main
+      #working-directory: ./main
 
     # Instala Terraform
     - name: Setup Terraform
