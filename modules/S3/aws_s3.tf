@@ -10,6 +10,15 @@ resource "aws_s3_bucket" "website" {
   })
 }
 
+resource "aws_s3_bucket_public_access_block" "public_access" {
+  bucket = aws_s3_bucket.website.id
+
+  block_public_acls   = false
+  block_public_policy = false
+  ignore_public_acls  = false
+  restrict_public_buckets = false
+}
+
 resource "aws_s3_bucket_website_configuration" "website" {
   bucket = aws_s3_bucket.website.id
 
@@ -18,12 +27,23 @@ resource "aws_s3_bucket_website_configuration" "website" {
   }
 }
 
-# Desbloquea el acceso público (necesario para un sitio estático)
-resource "aws_s3_bucket_public_access_block" "public_access" {
-  bucket = aws_s3_bucket.website.id
+data "aws_iam_policy_document" "website_policy" {
+  statement {
+    sid    = "AllowPublicRead"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.website.arn}/*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+  }
+}
 
-  block_public_acls   = false
-  block_public_policy = false
-  ignore_public_acls  = false
-  restrict_public_buckets = false
+resource "aws_s3_bucket_policy" "website_policy" {
+  bucket = aws_s3_bucket.website.id
+  policy = data.aws_iam_policy_document.website_policy.json
+
+  depends_on = [
+    aws_s3_bucket_public_access_block.public_access
+  ]
 }
