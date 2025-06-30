@@ -133,4 +133,4 @@ output "website_url" = "http://${var.bucket_name}.s3-website-${var.aws_region}.a
 ## 👤 Autor
 
 **Carlos Escobar**  
-📧 carlos.escobar@inbest.cloud
+📧 carlosescobar08@proton.me
