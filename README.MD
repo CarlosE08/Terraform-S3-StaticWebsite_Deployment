@@ -4,7 +4,7 @@ Este proyecto despliega un sitio web estático en un bucket de Amazon S3 utiliza
 
 ---
 
-## Arquitectura
+## Arquitectura.
 
 - **Amazon S3**: Bucket nuevo o existente configurado como sitio web.
 - **Configuración de hosting**: Usa `index.html` como documento raíz.
